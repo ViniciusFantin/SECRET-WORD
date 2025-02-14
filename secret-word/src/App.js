@@ -2,7 +2,7 @@
 import "./App.css";
 
 //React
-import { use, useCallBack, useEffect, useState } from "react";
+import { useCallBack, useEffect, useState } from "react";
 
 //Data
 import { wordsList } from "./data/word";
@@ -17,6 +17,8 @@ const stages = [
   { id: 2, name: "game" },
   { id: 3, name: "end" },
 ];
+
+const guessesQty = 4;
 
 function App() {
   const [gameStage, setGameStage] = useState(stages[0].name);
@@ -70,11 +72,48 @@ function App() {
   };
 
   // processes the letter input
-  const verifyLetter = () => {
-    setGameStage(stages[2].name);
+  const verifyLetter = (letter) => {
+    const normalizedLetter = letter.toLowerCase();
+
+    // check if letter has already been utilized
+    if (
+      guessedLetters.includes(normalizedLetter) ||
+      wrongLetters.includes(normalizedLetter)
+    ) {
+      return;
+    }
+
+    // psuh guessed letter or remove a guess
+    if (letters.includes(normalizedLetter)) {
+      setGuessedLetters((actualGuessedLetters) => [
+        ...actualGuessedLetters,
+        normalizedLetter,
+        letters,
+      ]);
+    } else {
+      setWrongLetters((actualWrongLetters) => [
+        ...actualWrongLetters,
+        normalizedLetter,
+      ]);
+
+      setGuesses((actualGuesses) => actualGuesses - 1);
+    }
   };
 
+  const clearLettersStates = () => {
+    setGuessedLetters([]);
+    setWrongLetters([]);
+  };
+
+  useEffect(() => {
+    if (guesses <= 0) {
+      setGameStage(stages[2].name);
+    }
+  }, [guesses]);
+
   const Retry = () => {
+    setScore(0);
+    setGuesses(guessesQty);
     setGameStage(stages[0].name);
   };
 
@@ -88,12 +127,12 @@ function App() {
           pickedCategory={pickedCategory}
           letters={letters}
           guessedLetters={guessedLetters}
-          wrongLetter={wrongLetters}
+          wrongLetters={wrongLetters}
           guesses={guesses}
           scrore={score}
         />
       )}
-      {gameStage === "end" && <GameOver Retry={Retry} />}
+      {gameStage === "end" && <GameOver Retry={Retry} score={score} />}
     </div>
   );
 }
