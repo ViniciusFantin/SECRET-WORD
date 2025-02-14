@@ -86,7 +86,7 @@ function App() {
           verifyLetter={verifyLetter}
           pickedWord={pickedWord}
           pickedCategory={pickedCategory}
-          letter={letters}
+          letters={letters}
           guessedLetters={guessedLetters}
           wrongLetter={wrongLetters}
           guesses={guesses}
